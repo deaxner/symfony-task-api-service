@@ -142,6 +142,20 @@ docker compose down -v
 - The app container connects to MySQL using the service hostname `db`
 - JWT keys are generated automatically in the container if they are missing
 - Composer dependencies are persisted in a named Docker volume
+- CORS allows `http://localhost:3000` and `http://localhost:5173` by default through `FRONTEND_ORIGIN`
+
+## Demo Seeder
+
+Seed a repeatable demo dataset with 2 users and 100 tasks:
+
+```bash
+docker compose exec app php bin/console app:seed-demo-data
+```
+
+Demo credentials:
+
+- `alex@example.com / Password123`
+- `jamie@example.com / Password123`
 
 ## Example Endpoints
 
