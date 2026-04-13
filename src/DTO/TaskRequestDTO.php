@@ -4,6 +4,7 @@ namespace App\DTO;
 
 use App\Entity\Task;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class TaskRequestDTO
 {
@@ -22,6 +23,22 @@ class TaskRequestDTO
     #[Assert\Choice(choices: Task::PRIORITIES)]
     public ?string $priority = null;
 
-    #[Assert\DateTime(format: \DateTimeInterface::ATOM)]
     public ?string $dueDate = null;
+
+    #[Assert\Callback]
+    public function validate(ExecutionContextInterface $context): void
+    {
+        if (null === $this->dueDate || '' === $this->dueDate) {
+            return;
+        }
+
+        try {
+            new \DateTimeImmutable($this->dueDate);
+        } catch (\Exception) {
+            $context
+                ->buildViolation('This value is not a valid datetime.')
+                ->atPath('dueDate')
+                ->addViolation();
+        }
+    }
 }

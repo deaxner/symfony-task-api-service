@@ -23,7 +23,7 @@ services:
       - symfony_vendor:/var/www/html/vendor
       - symfony_var:/var/www/html/var
     networks:
-      - task_api_network
+      - portfolio_suite_network
 
   db:
     image: mysql:8.0
@@ -45,7 +45,7 @@ services:
       retries: 10
       start_period: 20s
     networks:
-      - task_api_network
+      - portfolio_suite_network
 
 volumes:
   mysql_data:
@@ -53,5 +53,6 @@ volumes:
   symfony_var:
 
 networks:
-  task_api_network:
-    name: task_api_network
+  portfolio_suite_network:
+    external: true
+    name: portfolio_suite_network

@@ -26,4 +26,12 @@ fi
 
 php bin/console cache:clear --no-warmup >/dev/null 2>&1 || true
 
+if [ "${AUTO_MIGRATE:-0}" = "1" ]; then
+  php bin/console doctrine:migrations:migrate --no-interaction
+fi
+
+if [ "${AUTO_SEED_DEMO:-0}" = "1" ]; then
+  php bin/console app:seed-demo-data
+fi
+
 exec "$@"
