@@ -1,0 +1,8 @@
+.git
+.gitignore
+.phpunit.cache
+docker-compose.yml
+node_modules
+var
+vendor
+config/jwt/*.pem

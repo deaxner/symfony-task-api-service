@@ -98,6 +98,51 @@ php bin/console doctrine:migrations:migrate
 symfony server:start
 ```
 
+## Docker
+
+This repo includes a Dockerized local stack for the API and MySQL, connected through the named Docker network `task_api_network`.
+
+### Start the stack
+
+```bash
+docker compose up --build -d
+```
+
+### Start the stack with automatic port fallback on Windows
+
+```powershell
+./docker-up.ps1
+```
+
+The script prefers port `8000`. If `8000` is already in use, it falls back to the next free port up to `8100` and starts the stack with that host port.
+
+### Run migrations inside the app container
+
+```bash
+docker compose exec app php bin/console doctrine:migrations:migrate --no-interaction
+```
+
+### Stop the stack
+
+```bash
+docker compose down
+```
+
+### Reset the database volume
+
+```bash
+docker compose down -v
+```
+
+### Docker notes
+
+- The API is exposed on `http://localhost:8000` by default
+- If `8000` is already in use, run `./docker-up.ps1` to auto-select the next free host port
+- MySQL is exposed on host port `3307`
+- The app container connects to MySQL using the service hostname `db`
+- JWT keys are generated automatically in the container if they are missing
+- Composer dependencies are persisted in a named Docker volume
+
 ## Example Endpoints
 
 ### Auth
@@ -196,6 +241,7 @@ symfony server:start
 - Tasks are only visible and mutable by their owner
 - Invalid credentials are logged to the `audit` channel
 - Task create, update, and delete actions are logged to the `audit` channel
+- The Docker setup uses an internal named network so the app and database communicate by service name instead of host-local addresses
 
 ## Running Tests
 
