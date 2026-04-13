@@ -35,9 +35,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Task::class, orphanRemoval: true)]
     private Collection $tasks;
 
+    /**
+     * @var Collection<int, Project>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Project::class, orphanRemoval: true)]
+    private Collection $projects;
+
+    /**
+     * @var Collection<int, TimeEntry>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: TimeEntry::class, orphanRemoval: true)]
+    private Collection $timeEntries;
+
     public function __construct()
     {
         $this->tasks = new ArrayCollection();
+        $this->projects = new ArrayCollection();
+        $this->timeEntries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -118,5 +132,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Project>
+     */
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+
+    /**
+     * @return Collection<int, TimeEntry>
+     */
+    public function getTimeEntries(): Collection
+    {
+        return $this->timeEntries;
     }
 }

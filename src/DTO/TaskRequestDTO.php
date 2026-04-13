@@ -23,21 +23,42 @@ class TaskRequestDTO
     #[Assert\Choice(choices: Task::PRIORITIES)]
     public ?string $priority = null;
 
+    #[Assert\NotNull]
+    #[Assert\Positive]
+    public ?int $projectId = null;
+
     public ?string $dueDate = null;
+    public ?string $startedAt = null;
+    public ?string $completedAt = null;
 
     #[Assert\Callback]
     public function validate(ExecutionContextInterface $context): void
     {
-        if (null === $this->dueDate || '' === $this->dueDate) {
-            return;
+        $parsedDates = [];
+
+        foreach (['dueDate', 'startedAt', 'completedAt'] as $field) {
+            $value = $this->{$field};
+            if (null === $value || '' === $value) {
+                continue;
+            }
+
+            try {
+                $parsedDates[$field] = new \DateTimeImmutable($value);
+            } catch (\Exception) {
+                $context
+                    ->buildViolation('This value is not a valid datetime.')
+                    ->atPath($field)
+                    ->addViolation();
+            }
         }
 
-        try {
-            new \DateTimeImmutable($this->dueDate);
-        } catch (\Exception) {
+        if (
+            isset($parsedDates['startedAt'], $parsedDates['completedAt']) &&
+            $parsedDates['completedAt'] < $parsedDates['startedAt']
+        ) {
             $context
-                ->buildViolation('This value is not a valid datetime.')
-                ->atPath('dueDate')
+                ->buildViolation('Completed date must be after the start date.')
+                ->atPath('completedAt')
                 ->addViolation();
         }
     }

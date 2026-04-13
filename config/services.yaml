@@ -29,6 +29,10 @@ services:
         bind:
             $apiLimiter: '@limiter.task_api'
 
+    App\Controller\TimeEntryController:
+        bind:
+            $apiLimiter: '@limiter.task_api'
+
     App\Service\TaskService:
         bind:
             $auditLogger: '@monolog.logger.audit'

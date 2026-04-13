@@ -36,6 +36,7 @@ class TaskController extends ApiController
             'limit' => (int) $request->query->get('limit', 10),
             'status' => $request->query->get('status'),
             'priority' => $request->query->get('priority'),
+            'projectId' => $request->query->getInt('projectId') ?: null,
             'search' => $request->query->get('search'),
             'sort' => $request->query->get('sort', 'createdAt'),
             'direction' => $request->query->get('direction', 'desc'),
@@ -92,7 +93,10 @@ class TaskController extends ApiController
         $dto->description = $payload['description'] ?? null;
         $dto->status = $payload['status'] ?? null;
         $dto->priority = $payload['priority'] ?? null;
+        $dto->projectId = isset($payload['projectId']) ? (int) $payload['projectId'] : null;
         $dto->dueDate = $payload['dueDate'] ?? null;
+        $dto->startedAt = $payload['startedAt'] ?? null;
+        $dto->completedAt = $payload['completedAt'] ?? null;
 
         $violations = $this->validator->validate($dto);
         if (count($violations) > 0) {

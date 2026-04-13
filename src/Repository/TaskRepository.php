@@ -19,7 +19,7 @@ class TaskRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param array{page?: int, limit?: int, status?: ?string, priority?: ?string, search?: ?string, sort?: ?string, direction?: ?string} $filters
+     * @param array{page?: int, limit?: int, status?: ?string, priority?: ?string, projectId?: ?int, search?: ?string, sort?: ?string, direction?: ?string} $filters
      *
      * @return array{items: Task[], total: int, page: int, limit: int, pages: int}
      */
@@ -32,12 +32,15 @@ class TaskRepository extends ServiceEntityRepository
         $sortField = match ($filters['sort'] ?? 'createdAt') {
             'updatedAt' => 't.updatedAt',
             'dueDate' => 't.dueDate',
+            'startedAt' => 't.startedAt',
+            'completedAt' => 't.completedAt',
             default => 't.createdAt',
         };
 
         $direction = strtoupper((string) ($filters['direction'] ?? 'DESC')) === 'ASC' ? 'ASC' : 'DESC';
 
         $qb = $this->createQueryBuilder('t')
+            ->leftJoin('t.project', 'p')
             ->andWhere('t.user = :user')
             ->setParameter('user', $user)
             ->orderBy($sortField, $direction)
@@ -52,9 +55,13 @@ class TaskRepository extends ServiceEntityRepository
             $qb->andWhere('t.priority = :priority')->setParameter('priority', $filters['priority']);
         }
 
+        if (!empty($filters['projectId'])) {
+            $qb->andWhere('p.id = :projectId')->setParameter('projectId', (int) $filters['projectId']);
+        }
+
         if (!empty($filters['search'])) {
             $qb
-                ->andWhere('LOWER(t.title) LIKE :search OR LOWER(COALESCE(t.description, \'\')) LIKE :search')
+                ->andWhere('LOWER(t.title) LIKE :search OR LOWER(COALESCE(t.description, \'\')) LIKE :search OR LOWER(p.name) LIKE :search')
                 ->setParameter('search', '%' . mb_strtolower((string) $filters['search']) . '%');
         }
 
