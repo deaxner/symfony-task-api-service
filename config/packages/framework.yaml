@@ -1,0 +1,21 @@
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    secret: '%env(APP_SECRET)%'
+    annotations: false
+    http_method_override: false
+    handle_all_throwables: true
+    php_errors:
+        log: true
+    rate_limiter:
+        auth_api:
+            policy: token_bucket
+            limit: 5
+            rate: { interval: '1 minute', amount: 5 }
+        task_api:
+            policy: sliding_window
+            limit: 120
+            interval: '1 minute'
+
+when@test:
+    framework:
+        test: true
